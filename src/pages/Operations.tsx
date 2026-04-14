@@ -41,9 +41,9 @@ export const Operations: React.FC = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {operations?.map((op) => (
-                        <Card key={op.id} className="p-6 space-y-4 hover:border-blue-200 hover:shadow-md transition-all">
+                        <Card key={op.id} className="p-6 space-y-4 hover:border-emerald-200 hover:shadow-md transition-all">
                             <div className="flex items-start justify-between">
-                                <div className="p-3 rounded-xl bg-blue-50 text-blue-600">
+                                <div className="p-3 rounded-xl bg-emerald-50 text-emerald-600">
                                     <Briefcase size={24} />
                                 </div>
                                 <span className="px-3 py-1 rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
@@ -54,7 +54,7 @@ export const Operations: React.FC = () => {
                                 <h3 className="text-lg font-bold text-slate-900">{op.name}</h3>
                                 <div className="flex items-center gap-2 mt-2 text-slate-500">
                                     <Tag size={14} />
-                                    <p className="text-sm">Prix du billet: <span className="text-blue-600 font-bold">{op.ticket_price}€</span></p>
+                                    <p className="text-sm">Prix du billet: <span className="text-emerald-600 font-bold">{op.ticket_price}€</span></p>
                                 </div>
                             </div>
                             <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
@@ -62,7 +62,7 @@ export const Operations: React.FC = () => {
                                     <Calendar size={12} />
                                     Crée le {new Date(op.created_at).toLocaleDateString()}
                                 </div>
-                                <Button variant="ghost" className="text-xs h-8 text-blue-600 hover:bg-blue-50">Détails</Button>
+                                <Button variant="ghost" className="text-xs h-8 text-emerald-600 hover:bg-emerald-50">Détails</Button>
                             </div>
                         </Card>
                     ))}

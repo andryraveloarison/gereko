@@ -112,88 +112,100 @@ export const Dashboard: React.FC = () => {
             </div>
 
             {/* Hero Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="p-6 bg-blue-50/50 border-blue-100">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Revenu Total</p>
-                            <h3 className="text-2xl font-bold mt-1 text-blue-900">{stats?.revenu}€</h3>
+            <div className="flex overflow-x-auto pb-4 -mx-4 px-4 lg:mx-0 lg:px-0 gap-6 snap-x snap-mandatory no-scrollbar lg:grid lg:grid-cols-4 lg:overflow-visible lg:pb-0">
+                <div className="snap-center lg:snap-align-none min-w-[280px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
+                    <div className="h-full bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/40 flex flex-col justify-between border border-slate-100/50 transition-all hover:shadow-2xl hover:shadow-emerald-500/10">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Revenu Total</p>
+                                <h3 className="text-3xl font-bold mt-1 ">{stats?.revenu.toLocaleString()} Ar</h3>
+                            </div>
+                            <div className="p-2 rounded-xl bg-emerald-100/50 text-emerald-600">
+                                <DollarSign size={45} />
+                            </div>
                         </div>
-                        <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
-                            <DollarSign size={20} />
+                        <div className="mt-6 flex items-center text-xs text-slate-500 border-t border-slate-50 pt-4">
+                            <span className="text-emerald-600 font-bold mr-1">{stats?.billets_payes} billets</span> payés sur {stats?.billets_vendus} vendus
                         </div>
                     </div>
-                    <div className="mt-4 flex items-center text-xs text-slate-500">
-                        <span className="text-blue-600 font-bold mr-1">{stats?.billets_payes} billets</span> payés sur {stats?.billets_vendus} vendus
-                    </div>
-                </Card>
+                </div>
 
-                <Card className="p-6 bg-rose-50/50 border-rose-100">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-xs font-semibold text-rose-600 uppercase tracking-wider">Total Dépenses</p>
-                            <h3 className="text-2xl font-bold mt-1 text-rose-900">{stats?.total_depenses}€</h3>
+                <div className="snap-center lg:snap-align-none min-w-[280px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
+                    <div className="h-full bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/40 flex flex-col justify-between border border-slate-100/50 transition-all hover:shadow-2xl hover:shadow-rose-500/10">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Dépenses</p>
+                                <h3 className="text-3xl font-bold mt-1 text-rose-900">{stats?.total_depenses.toLocaleString()} Ar</h3>
+                            </div>
+                            <div className="p-2 rounded-xl bg-rose-100/50 text-rose-600">
+                                <Wallet size={45} />
+                            </div>
                         </div>
-                        <div className="p-2 rounded-lg bg-rose-100 text-rose-600">
-                            <Wallet size={20} />
+                        <div className="mt-6 flex items-center text-xs text-slate-500 border-t border-slate-50 pt-4">
+                            Fixes et variables confondues
                         </div>
                     </div>
-                    <div className="mt-4 flex items-center text-xs text-slate-500">
-                        Fixes et variables confondues
-                    </div>
-                </Card>
+                </div>
 
-                <Card className={cn(
-                    "p-6",
-                    stats?.is_profit ? "bg-emerald-50/50 border-emerald-100" : "bg-rose-50/50 border-rose-100"
-                )}>
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className={cn(
-                                "text-xs font-semibold uppercase tracking-wider",
-                                stats?.is_profit ? "text-emerald-600" : "text-rose-600"
-                            )}>{stats?.is_profit ? 'Bénéfice' : 'Perte'}</p>
-                            <h3 className={cn(
-                                "text-2xl font-bold mt-1",
-                                stats?.is_profit ? "text-emerald-900" : "text-rose-900"
-                            )}>
-                                {Math.abs(stats?.benefice || 0)}€
-                            </h3>
-                        </div>
-                        <div className={cn(
-                            "p-2 rounded-lg",
-                            stats?.is_profit ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
-                        )}>
-                            {stats?.is_profit ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
-                        </div>
-                    </div>
-                    <p className={cn(
-                        "mt-4 text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded inline-block",
-                        stats?.is_profit ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                <div className="snap-center lg:snap-align-none min-w-[280px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
+                    <div className={cn(
+                        "h-full bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/40 flex flex-col justify-between border border-slate-100/50 transition-all hover:shadow-2xl",
+                        stats?.is_profit ? "hover:shadow-emerald-500/10" : "hover:shadow-rose-500/10"
                     )}>
-                        {stats?.is_profit ? 'RENTABLE' : 'DÉFICIT'}
-                    </p>
-                </Card>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className={cn(
+                                    "text-xs font-semibold uppercase tracking-wider",
+                                    "text-slate-400 uppercase"
+                                )}>{stats?.is_profit ? 'Bénéfice' : 'Perte'}</p>
+                                <h3 className={cn(
+                                    "text-3xl font-bold mt-1",
+                                    stats?.is_profit ? "text-emerald-900" : "text-rose-900"
+                                )}>
+                                    {Math.abs(stats?.benefice || 0).toLocaleString()} Ar
+                                </h3>
+                            </div>
+                            <div className={cn(
+                                "p-2 rounded-xl",
+                                stats?.is_profit ? "bg-emerald-100/50 text-emerald-600" : "bg-rose-100/50 text-rose-600"
+                            )}>
+                                {stats?.is_profit ? <TrendingUp size={45} /> : <TrendingDown size={45} />}
+                            </div>
+                        </div>
+                        <div className="mt-6 border-t border-slate-50 pt-4">
+                            <p className={cn(
+                                "text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded inline-block",
+                                stats?.is_profit ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                            )}>
+                                {stats?.is_profit ? 'RENTABLE' : 'DÉFICIT'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                <Card className="p-6 bg-gradient-to-br from-amber-600/10 to-transparent border-amber-500/10">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-sm font-medium text-slate-400">Progression Ventes</p>
-                            <h3 className="text-2xl font-bold mt-1">
-                                {stats?.total_billets ? Math.round((stats.billets_vendus / stats.total_billets) * 100) : 0}%
-                            </h3>
+                <div className="snap-center lg:snap-align-none min-w-[280px] lg:min-w-0 flex-shrink-0 lg:flex-shrink">
+                    <div className="h-full bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/40 flex flex-col justify-between border border-slate-100/50 transition-all hover:shadow-2xl hover:shadow-amber-500/10">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Progression Ventes</p>
+                                <h3 className="text-3xl font-bold mt-1 text-slate-900">
+                                    {stats?.total_billets ? Math.round((stats.billets_vendus / stats.total_billets) * 100) : 0}%
+                                </h3>
+                            </div>
+                            <div className="p-2 rounded-xl bg-amber-100/50 text-amber-600">
+                                <TicketIcon size={45} />
+                            </div>
                         </div>
-                        <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400">
-                            <TicketIcon size={20} />
+                        <div className="mt-6 border-t border-slate-50 pt-4">
+                            <div className="w-full bg-slate-100 rounded-full h-1.5">
+                                <div
+                                    className="bg-amber-500 h-1.5 rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(245,158,11,0.3)]"
+                                    style={{ width: `${stats?.total_billets ? (stats.billets_vendus / stats.total_billets) * 100 : 0}%` }}
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div className="mt-4 w-full bg-slate-800 rounded-full h-1.5">
-                        <div
-                            className="bg-amber-500 h-1.5 rounded-full transition-all duration-1000"
-                            style={{ width: `${stats?.total_billets ? (stats.billets_vendus / stats.total_billets) * 100 : 0}%` }}
-                        />
-                    </div>
-                </Card>
+                </div>
             </div>
 
             {/* Charts Row */}
@@ -204,7 +216,7 @@ export const Dashboard: React.FC = () => {
                         <BarChart data={chartData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                             <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                            <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}€`} />
+                            <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `${v} Ar`} />
                             <Tooltip
                                 contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                 itemStyle={{ fontWeight: 'bold' }}
@@ -247,7 +259,7 @@ export const Dashboard: React.FC = () => {
             {/* Seller Performance */}
             <Card className="overflow-hidden border-slate-200">
                 <div className="p-6 border-b border-slate-100 flex items-center gap-2 bg-slate-50/50">
-                    <Users size={20} className="text-blue-600" />
+                    <Users size={20} className="text-emerald-600" />
                     <h3 className="text-lg font-semibold text-slate-900">Performance par Vendeur</h3>
                 </div>
                 <div className="overflow-x-auto">
@@ -267,12 +279,12 @@ export const Dashboard: React.FC = () => {
                                     <td className="px-6 py-4 font-semibold text-slate-900">{s.name}</td>
                                     <td className="px-6 py-4 text-slate-600">{s.assigned}</td>
                                     <td className="px-6 py-4 text-emerald-600 font-medium">{s.sold}</td>
-                                    <td className="px-6 py-4 text-blue-600 font-medium">{s.paid}</td>
+                                    <td className="px-6 py-4 text-emerald-600 font-medium">{s.paid}</td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="flex-1 bg-slate-100 rounded-full h-2 min-w-[100px]">
                                                 <div
-                                                    className="bg-blue-600 h-2 rounded-full shadow-sm shadow-blue-200"
+                                                    className="bg-emerald-600 h-2 rounded-full shadow-sm shadow-emerald-200"
                                                     style={{ width: `${Math.round((s.sold / s.assigned) * 100)}%` }}
                                                 />
                                             </div>

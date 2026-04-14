@@ -53,10 +53,10 @@ export const Sellers: React.FC = () => {
                                 <tr key={seller.id} className="hover:bg-slate-50 transition-colors group">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shadow-inner">
+                                            <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold shadow-inner">
                                                 {seller.name.charAt(0).toUpperCase()}
                                             </div>
-                                            <span className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{seller.name}</span>
+                                            <span className="font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">{seller.name}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">

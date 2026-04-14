@@ -141,7 +141,7 @@ export const Tickets: React.FC = () => {
                     <h1 className="text-2xl font-bold text-slate-900">Gestion des Billets</h1>
                     <p className="text-slate-500">Assignez et suivez le statut des billets par opération</p>
                 </div>
-                <div className="flex-1 max-w-md mx-auto md:mx-4">
+                <div className="flex-0 max-w-md">
                     <div className="relative">
                         <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <Input
@@ -188,7 +188,7 @@ export const Tickets: React.FC = () => {
                                     <th className="px-6 py-4 w-10">
                                         <button onClick={toggleAllSelection} className="text-slate-400 hover:text-slate-600 transition-colors">
                                             {selectedTickets.length === filteredTickets.length && filteredTickets.length > 0
-                                                ? <CheckSquare size={20} className="text-blue-600" />
+                                                ? <CheckSquare size={20} className="text-emerald-600" />
                                                 : <Square size={20} />
                                             }
                                         </button>
@@ -213,15 +213,15 @@ export const Tickets: React.FC = () => {
                                             key={ticket.id}
                                             className={cn(
                                                 "hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0",
-                                                selectedTickets.includes(ticket.id) && "bg-blue-50"
+                                                selectedTickets.includes(ticket.id) && "bg-emerald-50"
                                             )}
                                         >
                                             <td className="px-6 py-4">
-                                                <button onClick={() => toggleTicketSelection(ticket.id)} className="text-slate-400 hover:text-blue-600 transition-colors">
-                                                    {selectedTickets.includes(ticket.id) ? <CheckSquare size={20} className="text-blue-600" /> : <Square size={20} />}
+                                                <button onClick={() => toggleTicketSelection(ticket.id)} className="text-slate-400 hover:text-emerald-600 transition-colors">
+                                                    {selectedTickets.includes(ticket.id) ? <CheckSquare size={20} className="text-emerald-600" /> : <Square size={20} />}
                                                 </button>
                                             </td>
-                                            <td className="px-6 py-4 font-mono font-bold text-blue-600 text-sm">
+                                            <td className="px-6 py-4 font-mono font-bold text-emerald-600 text-sm">
                                                 #{String(ticket.number).padStart(4, '0')}
                                             </td>
                                             <td className="px-6 py-4">
@@ -240,7 +240,7 @@ export const Tickets: React.FC = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 {ticket.is_paid ? (
-                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 border border-blue-200">
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 border border-emerald-200">
                                                         Payé
                                                     </span>
                                                 ) : (
@@ -250,7 +250,7 @@ export const Tickets: React.FC = () => {
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <Button variant="ghost" className="text-xs h-8 text-blue-600 hover:bg-blue-50" onClick={() => handleEdit(ticket)}>Modifier</Button>
+                                                <Button variant="ghost" className="text-xs h-8 text-emerald-600 hover:bg-emerald-50" onClick={() => handleEdit(ticket)}>Modifier</Button>
                                             </td>
                                         </tr>
                                     ))
@@ -323,7 +323,7 @@ export const Tickets: React.FC = () => {
                         <label className="text-sm font-medium text-slate-700">Billet vendu ?</label>
                         <input
                             type="checkbox"
-                            className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                            className="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                             checked={editData.is_sold}
                             onChange={e => setEditData({ ...editData, is_sold: e.target.checked })}
                         />
@@ -332,7 +332,7 @@ export const Tickets: React.FC = () => {
                         <label className="text-sm font-medium text-slate-700">Billet payé ?</label>
                         <input
                             type="checkbox"
-                            className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                            className="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                             checked={editData.is_paid}
                             onChange={e => setEditData({ ...editData, is_paid: e.target.checked })}
                         />

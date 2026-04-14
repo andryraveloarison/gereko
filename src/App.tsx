@@ -6,6 +6,7 @@ import { Operations } from './pages/Operations';
 import { Sellers } from './pages/Sellers';
 import { Tickets } from './pages/Tickets';
 import { Expenses } from './pages/Expenses';
+import { About } from './pages/About';
 import { OperationProvider } from './context/OperationContext';
 
 const queryClient = new QueryClient({
@@ -29,6 +30,7 @@ function App() {
               <Route path="/sellers" element={<Sellers />} />
               <Route path="/tickets" element={<Tickets />} />
               <Route path="/expenses" element={<Expenses />} />
+              <Route path="/about" element={<About />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Layout>

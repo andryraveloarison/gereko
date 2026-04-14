@@ -14,8 +14,8 @@ export const Card: React.FC<{ children: React.ReactNode, className?: string }> =
 
 export const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' }> = ({ children, className, variant = 'primary', ...props }) => {
     const variants = {
-        primary: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-200",
-        secondary: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-200",
+        primary: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-200",
+        secondary: "bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200",
         outline: "border border-slate-200 bg-white hover:bg-slate-50 text-slate-700",
         ghost: "hover:bg-slate-100 text-slate-500 hover:text-slate-900",
         danger: "bg-rose-600 hover:bg-rose-700 text-white shadow-sm shadow-rose-200"
@@ -40,7 +40,7 @@ export const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { lab
         {label && <label className="text-sm font-medium text-slate-700 ml-1">{label}</label>}
         <input
             className={cn(
-                "w-full bg-white border border-slate-300 rounded-xl px-4 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm",
+                "w-full bg-white border border-slate-300 rounded-xl px-4 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm",
                 className
             )}
             {...props}
@@ -53,7 +53,7 @@ export const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement> & { 
         {label && <label className="text-sm font-medium text-slate-700 ml-1">{label}</label>}
         <select
             className={cn(
-                "w-full bg-white border border-slate-300 rounded-xl px-4 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm",
+                "w-full bg-white border border-slate-300 rounded-xl px-4 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm",
                 className
             )}
             {...props}

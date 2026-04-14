@@ -79,7 +79,7 @@ export const Expenses: React.FC = () => {
                                             expenses?.map((expense) => (
                                                 <tr key={expense.id} className="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 text-sm">
                                                     <td className="px-6 py-4 font-semibold text-slate-900">{expense.label}</td>
-                                                    <td className="px-6 py-4 text-rose-600 font-bold">-{expense.amount}€</td>
+                                                    <td className="px-6 py-4 text-rose-600 font-bold">-{expense.amount}Ar</td>
                                                     <td className="px-6 py-4 text-slate-400 font-medium">
                                                         {new Date(expense.created_at).toLocaleDateString()}
                                                     </td>
@@ -102,7 +102,7 @@ export const Expenses: React.FC = () => {
                     <div className="space-y-6">
                         <Card className="p-6 bg-rose-50 border-rose-100">
                             <h3 className="text-xs font-bold text-rose-600 uppercase tracking-widest mb-2">Total Dépenses</h3>
-                            <p className="text-3xl font-bold text-rose-700">{totalExpenses}€</p>
+                            <p className="text-3xl font-bold text-rose-700">{totalExpenses}Ar</p>
                             <div className="mt-4 flex items-center gap-2 text-xs text-slate-500 font-medium">
                                 <Tag size={12} />
                                 <span>Pour {selectedOperationId ? operations?.find(o => o.id === selectedOperationId)?.name : 'toutes les opérations'}</span>
@@ -118,7 +118,7 @@ export const Expenses: React.FC = () => {
                                 </div>
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-slate-500">Moyenne / dépense</span>
-                                    <span className="font-bold text-slate-900">{(totalExpenses / (expenses?.length || 1)).toFixed(2)}€</span>
+                                    <span className="font-bold text-slate-900">{(totalExpenses / (expenses?.length || 1)).toFixed(2)}Ar</span>
                                 </div>
                             </div>
                         </Card>
@@ -151,7 +151,7 @@ export const Expenses: React.FC = () => {
                         required
                     />
                     <Input
-                        label="Montant (€)"
+                        label="Montant (Ar)"
                         type="number"
                         placeholder="0.00"
                         value={formData.amount || ''}

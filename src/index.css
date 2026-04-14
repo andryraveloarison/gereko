@@ -7,7 +7,7 @@
 
   color-scheme: light;
   color: #1e293b;
-  background-color: #f8fafc;
+  background-color: #ffffff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -21,7 +21,7 @@ body {
   place-content: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: #ffffff;
 }
 
 #root {
@@ -29,11 +29,20 @@ body {
 }
 
 @theme {
-  --color-primary: #2563eb;
+  --color-primary: #10b981;
   --color-secondary: #64748b;
-  --color-accent: #f59e0b;
-  --color-background: #f8fafc;
+  --color-accent: #059669;
+  --color-background: #ffffff;
   --color-card: #ffffff;
   --color-text: #0f172a;
-  --color-border: #e2e8f0;
+  --color-border: #f1f5f9;
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
