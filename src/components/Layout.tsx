@@ -62,11 +62,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             {/* Sidebar - z-z-[70] to be above everything */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-[70] w-64 bg-slate-900 transition-all duration-700 ease-in-out lg:relative border-r border-slate-800 shadow-2xl shadow-black/50",
-                    !isSidebarOpen ? "-translate-x-full lg:w-0 lg:opacity-0" : "translate-x-0"
+                    "fixed inset-y-0 left-0 z-[70] w-64 bg-slate-900 transition-all duration-700 ease-in-out lg:relative lg:translate-x-0 lg:opacity-100 lg:w-64 border-r border-slate-800 shadow-2xl shadow-black/50",
+                    !isSidebarOpen ? "-translate-x-full lg:translate-x-0" : "translate-x-0"
                 )}
             >
-                <div className={cn("flex flex-col h-full text-white transition-opacity duration-300", !isSidebarOpen && "lg:opacity-0")}>
+                <div className={cn("flex flex-col h-full text-white transition-opacity duration-300", (!isSidebarOpen) ? "opacity-0 lg:opacity-100" : "opacity-100")}>
                     <div className="flex items-center justify-between h-16 px-6 border-b border-white/5">
                         <div className="flex items-center">
                             <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
@@ -88,7 +88,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         {navigation.map((item) => (
                             <NavLink
                                 onClick={() => {
-                                    setTimeout(() => setIsSidebarOpen(false), 250)
+                                    if (window.innerWidth < 1024) {
+                                        setTimeout(() => setIsSidebarOpen(false), 250)
+                                    }
                                 }}
                                 key={item.name}
                                 to={item.href}
@@ -124,13 +126,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <div className="h-full px-4 flex items-center justify-between lg:px-8 max-w-7xl mx-auto w-full">
                         <div className="flex items-center gap-4">
                             <button
-                                className="p-2 text-slate-500 hover:text-emerald-600 transition-colors"
+                                className="p-2 text-slate-500 hover:text-emerald-600 transition-colors lg:hidden"
                                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                             >
                                 <Menu size={24} />
                             </button>
                             {/* Empty space for sidebar when open on large screens */}
-                            <div className={cn("hidden lg:block transition-all duration-700", isSidebarOpen ? "w-64" : "w-0")} />
+                            <div className="hidden lg:block w-64" />
                         </div>
 
                         <div className="flex items-center space-x-4 flex-1 justify-end">
