@@ -54,7 +54,7 @@ export const Operations: React.FC = () => {
                                 <h3 className="text-lg font-bold text-slate-900">{op.name}</h3>
                                 <div className="flex items-center gap-2 mt-2 text-slate-500">
                                     <Tag size={14} />
-                                    <p className="text-sm">Prix du billet: <span className="text-emerald-600 font-bold">{op.ticket_price}€</span></p>
+                                    <p className="text-sm">Prix du billet: <span className="text-emerald-600 font-bold">{op.ticket_price}Ar</span></p>
                                 </div>
                             </div>
                             <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
