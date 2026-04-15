@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { useSellers, useTickets, useAssignTickets, useUpdateTicket, useUpdateTickets } from '../hooks/useData';
+import { useSellers, useTickets, useAssignTickets, useUpdateTicket, useUpdateTickets, useTicketTypes } from '../hooks/useData';
 import { Card, Button, Input, Select, Modal, cn } from '../components/UI';
-import { Plus, Ticket as TicketIcon, CheckSquare, Square, CreditCard, Search } from 'lucide-react';
+import { Plus, Ticket as TicketIcon, CheckSquare, Square, CreditCard, Search, Tag } from 'lucide-react';
 import { useOperation } from '../context/OperationContext';
 import type { Ticket } from '../types';
 
@@ -9,6 +9,7 @@ export const Tickets: React.FC = () => {
     const { selectedOperationId } = useOperation();
     const { data: sellers } = useSellers();
     const { data: tickets, isLoading } = useTickets(selectedOperationId);
+    const { data: ticketTypes } = useTicketTypes(selectedOperationId);
 
     const assignTickets = useAssignTickets();
     const updateTicket = useUpdateTicket();
@@ -24,14 +25,16 @@ export const Tickets: React.FC = () => {
     const [assignData, setAssignData] = useState({
         sellerId: '',
         startNumber: 1,
-        endNumber: 10
+        endNumber: 10,
+        ticketTypeId: ''
     });
 
     const [editData, setEditData] = useState({
         is_sold: false,
         is_paid: false,
         payment_reference: '',
-        payment_date: ''
+        payment_date: '',
+        ticketTypeId: ''
     });
 
     const [bulkData, setBulkData] = useState({
@@ -49,7 +52,7 @@ export const Tickets: React.FC = () => {
         }, {
             onSuccess: () => {
                 setIsAssignModalOpen(false);
-                setAssignData({ sellerId: '', startNumber: 1, endNumber: 10 });
+                setAssignData({ sellerId: '', startNumber: 1, endNumber: 10, ticketTypeId: '' });
             }
         });
     };
@@ -60,7 +63,8 @@ export const Tickets: React.FC = () => {
             is_sold: ticket.is_sold,
             is_paid: ticket.is_paid,
             payment_reference: ticket.payment_reference || '',
-            payment_date: ticket.payment_date || ''
+            payment_date: ticket.payment_date || '',
+            ticketTypeId: ticket.ticket_type_id || ''
         });
         setIsEditModalOpen(true);
     };
@@ -80,7 +84,8 @@ export const Tickets: React.FC = () => {
                 is_sold: editData.is_sold,
                 is_paid: editData.is_paid,
                 payment_reference: editData.payment_reference || null,
-                payment_date: paymentDate || null
+                payment_date: paymentDate || null,
+                ticket_type_id: editData.ticketTypeId || null
             }
         }, {
             onSuccess: () => {
@@ -195,6 +200,7 @@ export const Tickets: React.FC = () => {
                                     </th>
                                     <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Numéro</th>
                                     <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Vendeur</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Type</th>
                                     <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Statut Vente</th>
                                     <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Statut Paiement</th>
                                     <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
@@ -226,6 +232,16 @@ export const Tickets: React.FC = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className="font-semibold text-slate-900 text-sm">{ticket.seller?.name || 'Inconnu'}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-slate-500 text-sm">
+                                                    {ticket.ticket_type?.name ? (
+                                                        <span className="flex items-center gap-1">
+                                                            <Tag size={12} className="text-emerald-500" />
+                                                            {ticket.ticket_type.name}
+                                                        </span>
+                                                    ) : '-'}
+                                                </span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 {ticket.is_sold ? (
@@ -283,6 +299,15 @@ export const Tickets: React.FC = () => {
                     >
                         <option value="">Sélectionner un vendeur</option>
                         {sellers?.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </Select>
+                    <Select
+                        label="Type de billet"
+                        required
+                        value={assignData.ticketTypeId}
+                        onChange={e => setAssignData({ ...assignData, ticketTypeId: e.target.value })}
+                    >
+                        <option value="">Sélectionner un type</option>
+                        {ticketTypes?.map(t => <option key={t.id} value={t.id}>{t.name} ({t.price}Ar)</option>)}
                     </Select>
                     <div className="grid grid-cols-2 gap-4">
                         <Input
@@ -349,6 +374,14 @@ export const Tickets: React.FC = () => {
                         value={editData.payment_date}
                         onChange={e => setEditData({ ...editData, payment_date: e.target.value })}
                     />
+                    <Select
+                        label="Type"
+                        value={editData.ticketTypeId}
+                        onChange={e => setEditData({ ...editData, ticketTypeId: e.target.value })}
+                    >
+                        <option value="">Sans type</option>
+                        {ticketTypes?.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                    </Select>
                     <div className="flex gap-3 pt-4">
                         <Button type="button" variant="outline" className="flex-1" onClick={() => setIsEditModalOpen(false)}>Annuler</Button>
                         <Button type="submit" className="flex-1" disabled={updateTicket.isPending}>

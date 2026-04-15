@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useOperations, useTickets, useExpenses, useSellers } from '../hooks/useData';
+import { useOperations, useTickets, useExpenses, useSellers, useTicketTypes } from '../hooks/useData';
 import { Card, cn } from '../components/UI';
 import { useOperation } from '../context/OperationContext';
 import {
@@ -8,7 +8,8 @@ import {
     DollarSign,
     Ticket as TicketIcon,
     Users,
-    Wallet
+    Wallet,
+    Tag
 } from 'lucide-react';
 import {
     BarChart,
@@ -31,6 +32,7 @@ export const Dashboard: React.FC = () => {
 
     const { data: tickets } = useTickets(selectedOperationId);
     const { data: expenses } = useExpenses(selectedOperationId);
+    const { data: ticketTypes } = useTicketTypes(selectedOperationId);
 
     const currentOperation = useMemo(() =>
         operations?.find(o => o.id === selectedOperationId),
@@ -43,20 +45,45 @@ export const Dashboard: React.FC = () => {
         const total_billets = tickets.length;
         const billets_vendus = tickets.filter(t => t.is_sold).length;
         const billets_payes = tickets.filter(t => t.is_paid).length;
-        const revenu = billets_payes * currentOperation.ticket_price;
+
+        // Calculate revenue based on ticket types
+        const revenue_by_type = tickets.filter(t => t.is_paid).reduce((acc, t) => {
+            const price = t.ticket_type?.price ?? currentOperation.ticket_price;
+            return acc + price;
+        }, 0);
+
         const total_depenses = expenses?.reduce((acc, curr) => acc + Number(curr.amount), 0) || 0;
-        const benefice = revenu - total_depenses;
+        const benefice = revenue_by_type - total_depenses;
 
         return {
             total_billets,
             billets_vendus,
             billets_payes,
-            revenu,
+            revenu: revenue_by_type,
             total_depenses,
             benefice,
             is_profit: benefice >= 0
         };
     }, [tickets, expenses, currentOperation]);
+
+    const typeStats = useMemo(() => {
+        if (!tickets || !ticketTypes) return [];
+
+        return ticketTypes.map(type => {
+            const typeTickets = tickets.filter(t => t.ticket_type_id === type.id);
+            const sold = typeTickets.filter(t => t.is_sold).length;
+            const paid = typeTickets.filter(t => t.is_paid).length;
+            return {
+                name: type.name,
+                price: type.price,
+                assigned: typeTickets.length,
+                sold,
+                nonSold: typeTickets.length - sold,
+                paid,
+                revenue: paid * type.price
+            };
+        }).filter(t => t.assigned > 0);
+    }, [tickets, ticketTypes]);
 
     const sellerStats = useMemo(() => {
         if (!tickets || !sellers) return [];
@@ -255,6 +282,52 @@ export const Dashboard: React.FC = () => {
                     </ResponsiveContainer>
                 </Card>
             </div>
+
+            {/* Ticket Type Performance */}
+            <Card className="overflow-hidden border-slate-200">
+                <div className="p-6 border-b border-slate-100 flex items-center gap-2 bg-slate-50/50">
+                    <Tag size={20} className="text-emerald-600" />
+                    <h3 className="text-lg font-semibold text-slate-900">Performance par Type de Billet</h3>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr className="bg-slate-50 border-b border-slate-100">
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Type</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Total</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Vendus</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Non Vendus</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Payés</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Chiffre d'Affaires</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {typeStats.map((t, idx) => (
+                                <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <p className="font-semibold text-slate-900">{t.name}</p>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase">{t.price.toLocaleString()} Ar / unité</p>
+                                    </td>
+                                    <td className="px-6 py-4 text-slate-600 font-medium">{t.assigned}</td>
+                                    <td className="px-6 py-4 text-emerald-600 font-medium">{t.sold}</td>
+                                    <td className="px-6 py-4 text-slate-400 font-medium">{t.nonSold}</td>
+                                    <td className="px-6 py-4 text-emerald-600 font-medium">{t.paid}</td>
+                                    <td className="px-6 py-4 font-bold text-slate-900">
+                                        {t.revenue.toLocaleString()} Ar
+                                    </td>
+                                </tr>
+                            ))}
+                            {typeStats.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-10 text-center text-slate-500 italic">
+                                        Aucun type de billet utilisé pour le moment.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </Card>
 
             {/* Seller Performance */}
             <Card className="overflow-hidden border-slate-200">

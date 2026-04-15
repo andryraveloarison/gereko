@@ -10,11 +10,20 @@ export interface Seller {
     name: string;
 }
 
+export interface TicketType {
+    id: string;
+    operation_id: string;
+    name: string;
+    price: number;
+    created_at: string;
+}
+
 export interface Ticket {
     id: string;
     number: number;
     seller_id: string;
     operation_id: string;
+    ticket_type_id: string | null;
     is_sold: boolean;
     is_paid: boolean;
     payment_reference: string | null;
@@ -22,6 +31,7 @@ export interface Ticket {
     // Join data
     seller?: Seller;
     operation?: Operation;
+    ticket_type?: TicketType;
 }
 
 export interface Expense {

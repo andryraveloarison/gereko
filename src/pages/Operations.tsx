@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
-import { useOperations, useCreateOperation } from '../hooks/useData';
+import { useOperations, useCreateOperation, useTicketTypes, useCreateTicketType, useDeleteTicketType } from '../hooks/useData';
 import { Card, Button, Input, Modal } from '../components/UI';
-import { Plus, Briefcase, Calendar, Tag } from 'lucide-react';
+import { Plus, Briefcase, Calendar, Tag, Trash2, Settings } from 'lucide-react';
+import type { Operation } from '../types';
 
 export const Operations: React.FC = () => {
     const { data: operations, isLoading } = useOperations();
     const createOperation = useCreateOperation();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isTypesModalOpen, setIsTypesModalOpen] = useState(false);
+    const [selectedOp, setSelectedOp] = useState<Operation | null>(null);
     const [formData, setFormData] = useState({ name: '', ticket_price: 0 });
+    const [typeFormData, setTypeFormData] = useState({ name: '', price: 0 });
+
+    const { data: ticketTypes } = useTicketTypes(selectedOp?.id);
+    const createTicketType = useCreateTicketType();
+    const deleteTicketType = useDeleteTicketType();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -17,6 +25,30 @@ export const Operations: React.FC = () => {
                 setFormData({ name: '', ticket_price: 0 });
             }
         });
+    };
+
+    const handleAddType = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedOp) return;
+        createTicketType.mutate({
+            operation_id: selectedOp.id,
+            name: typeFormData.name,
+            price: typeFormData.price || selectedOp.ticket_price
+        }, {
+            onSuccess: () => {
+                setTypeFormData({ name: '', price: 0 });
+            }
+        });
+    };
+
+    const handleDeleteType = (id: string) => {
+        if (!selectedOp) return;
+        deleteTicketType.mutate({ id, operationId: selectedOp.id });
+    };
+
+    const openTypesModal = (op: Operation) => {
+        setSelectedOp(op);
+        setIsTypesModalOpen(true);
     };
 
     return (
@@ -62,7 +94,14 @@ export const Operations: React.FC = () => {
                                     <Calendar size={12} />
                                     Crée le {new Date(op.created_at).toLocaleDateString()}
                                 </div>
-                                <Button variant="ghost" className="text-xs h-8 text-emerald-600 hover:bg-emerald-50">Détails</Button>
+                                <Button
+                                    variant="ghost"
+                                    className="text-xs h-8 text-emerald-600 hover:bg-emerald-50 flex items-center gap-1"
+                                    onClick={() => openTypesModal(op)}
+                                >
+                                    <Settings size={14} />
+                                    Types
+                                </Button>
                             </div>
                         </Card>
                     ))}
@@ -102,6 +141,58 @@ export const Operations: React.FC = () => {
                         </Button>
                     </div>
                 </form>
+            </Modal>
+            <Modal
+                isOpen={isTypesModalOpen}
+                onClose={() => setIsTypesModalOpen(false)}
+                title={`Gérer les types - ${selectedOp?.name}`}
+            >
+                <div className="space-y-6">
+                    <form onSubmit={handleAddType} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            <Input
+                                label="Nom du type"
+                                placeholder="Ex: Vanille"
+                                value={typeFormData.name}
+                                onChange={e => setTypeFormData({ ...typeFormData, name: e.target.value })}
+                                required
+                            />
+                            <Input
+                                label="Prix (Ar)"
+                                type="number"
+                                placeholder={selectedOp?.ticket_price.toString()}
+                                value={typeFormData.price || ''}
+                                onChange={e => setTypeFormData({ ...typeFormData, price: Number(e.target.value) })}
+                            />
+                        </div>
+                        <Button type="submit" className="w-full text-xs" disabled={createTicketType.isPending}>
+                            {createTicketType.isPending ? 'Ajout...' : 'Ajouter un type'}
+                        </Button>
+                    </form>
+
+                    <div className="space-y-2">
+                        <h4 className="text-sm font-bold text-slate-900 px-1">Types existants</h4>
+                        <div className="divide-y divide-slate-100 border border-slate-100 rounded-xl overflow-hidden">
+                            {ticketTypes?.map(type => (
+                                <div key={type.id} className="flex items-center justify-between p-3 bg-white hover:bg-slate-50 transition-colors">
+                                    <div>
+                                        <p className="font-semibold text-slate-900">{type.name}</p>
+                                        <p className="text-xs text-emerald-600 font-bold">{type.price} Ar</p>
+                                    </div>
+                                    <button
+                                        onClick={() => handleDeleteType(type.id)}
+                                        className="p-2 text-slate-400 hover:text-rose-600 transition-colors"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                            {(!ticketTypes || ticketTypes.length === 0) && (
+                                <p className="p-4 text-center text-xs text-slate-400 italic">Aucun type défini pour cette opération.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </Modal>
         </div>
     );

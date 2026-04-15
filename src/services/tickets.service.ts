@@ -5,7 +5,7 @@ export const ticketsService = {
     async getAllByOperation(operationId: string) {
         const { data, error } = await supabase
             .from('tickets')
-            .select('*, seller:sellers(*), operation:operations(*)')
+            .select('*, seller:sellers(*), operation:operations(*), ticket_type:ticket_types(*)')
             .eq('operation_id', operationId)
             .order('number');
 
@@ -13,7 +13,7 @@ export const ticketsService = {
         return data as Ticket[];
     },
 
-    async assignTickets(operationId: string, sellerId: string, startNumber: number, endNumber: number) {
+    async assignTickets(operationId: string, sellerId: string, startNumber: number, endNumber: number, ticketTypeId?: string) {
         const tickets = [];
         for (let i = startNumber; i <= endNumber; i++) {
             tickets.push({
@@ -21,7 +21,8 @@ export const ticketsService = {
                 seller_id: sellerId,
                 number: i,
                 is_sold: false,
-                is_paid: false
+                is_paid: false,
+                ticket_type_id: ticketTypeId || null
             });
         }
 
