@@ -294,9 +294,7 @@ export const Dashboard: React.FC = () => {
                         <thead>
                             <tr className="bg-slate-50 border-b border-slate-100">
                                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Type</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Total</th>
                                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Vendus</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Non Vendus</th>
                                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Payés</th>
                                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Chiffre d'Affaires</th>
                             </tr>
@@ -308,9 +306,7 @@ export const Dashboard: React.FC = () => {
                                         <p className="font-semibold text-slate-900">{t.name}</p>
                                         <p className="text-[10px] text-slate-400 font-bold uppercase">{t.price.toLocaleString()} Ar / unité</p>
                                     </td>
-                                    <td className="px-6 py-4 text-slate-600 font-medium">{t.assigned}</td>
                                     <td className="px-6 py-4 text-emerald-600 font-medium">{t.sold}</td>
-                                    <td className="px-6 py-4 text-slate-400 font-medium">{t.nonSold}</td>
                                     <td className="px-6 py-4 text-emerald-600 font-medium">{t.paid}</td>
                                     <td className="px-6 py-4 font-bold text-slate-900">
                                         {t.revenue.toLocaleString()} Ar

@@ -86,7 +86,7 @@ export const About: React.FC = () => {
 
             <div className="text-center pt-10">
                 <p className="text-sm text-slate-400">
-                    Version 1.0.0
+                    Version 1.3.0
                 </p>
             </div>
         </div>

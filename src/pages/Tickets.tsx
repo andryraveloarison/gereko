@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { useSellers, useTickets, useAssignTickets, useUpdateTicket, useUpdateTickets, useTicketTypes } from '../hooks/useData';
+import { useSellers, useTickets, useAssignTickets, useUpdateTickets, useTicketTypes } from '../hooks/useData';
 import { Card, Button, Input, Select, Modal, cn } from '../components/UI';
-import { Plus, Ticket as TicketIcon, CheckSquare, Square, CreditCard, Search, Tag } from 'lucide-react';
+import { Plus, Ticket as TicketIcon, CheckSquare, Square, CreditCard, Search, Tag, ShoppingBag, X } from 'lucide-react';
 import { useOperation } from '../context/OperationContext';
-import type { Ticket } from '../types';
 
 export const Tickets: React.FC = () => {
     const { selectedOperationId } = useOperation();
@@ -12,35 +11,30 @@ export const Tickets: React.FC = () => {
     const { data: ticketTypes } = useTicketTypes(selectedOperationId);
 
     const assignTickets = useAssignTickets();
-    const updateTicket = useUpdateTicket();
     const updateTickets = useUpdateTickets();
 
     const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isBulkSellModalOpen, setIsBulkSellModalOpen] = useState(false);
     const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
-    const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [ticketToCancel, setTicketToCancel] = useState<string | null>(null);
 
     const [assignData, setAssignData] = useState({
         sellerId: '',
         startNumber: 1,
-        endNumber: 10,
-        ticketTypeId: ''
+        endNumber: 10
     });
 
-    const [editData, setEditData] = useState({
-        is_sold: false,
-        is_paid: false,
-        payment_reference: '',
-        payment_date: '',
+    const [bulkSellData, setBulkSellData] = useState({
         ticketTypeId: ''
     });
 
     const [bulkData, setBulkData] = useState({
         is_paid: true,
         payment_reference: '',
-        payment_date: new Date().toISOString().split('T')[0]
+        payment_date: new Date().toISOString().split('T')[0],
+        ticketTypeId: ''
     });
 
     const handleAssign = (e: React.FormEvent) => {
@@ -52,44 +46,27 @@ export const Tickets: React.FC = () => {
         }, {
             onSuccess: () => {
                 setIsAssignModalOpen(false);
-                setAssignData({ sellerId: '', startNumber: 1, endNumber: 10, ticketTypeId: '' });
+                setAssignData({ sellerId: '', startNumber: 1, endNumber: 10 });
             }
         });
     };
 
-    const handleEdit = (ticket: Ticket) => {
-        setSelectedTicket(ticket);
-        setEditData({
-            is_sold: ticket.is_sold,
-            is_paid: ticket.is_paid,
-            payment_reference: ticket.payment_reference || '',
-            payment_date: ticket.payment_date || '',
-            ticketTypeId: ticket.ticket_type_id || ''
-        });
-        setIsEditModalOpen(true);
-    };
-
-    const handleUpdate = (e: React.FormEvent) => {
+    const handleBulkSell = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedTicket) return;
+        if (selectedTickets.length === 0 || !selectedOperationId) return;
 
-        // Default to now if paid but no date
-        const paymentDate = editData.is_paid && !editData.payment_date
-            ? new Date().toISOString()
-            : editData.payment_date;
-
-        updateTicket.mutate({
-            id: selectedTicket.id,
+        updateTickets.mutate({
+            ids: selectedTickets,
+            operationId: selectedOperationId,
             updates: {
-                is_sold: editData.is_sold,
-                is_paid: editData.is_paid,
-                payment_reference: editData.payment_reference || null,
-                payment_date: paymentDate || null,
-                ticket_type_id: editData.ticketTypeId || null
+                is_sold: true,
+                ticket_type_id: bulkSellData.ticketTypeId || null
             }
         }, {
             onSuccess: () => {
-                setIsEditModalOpen(false);
+                setIsBulkSellModalOpen(false);
+                setSelectedTickets([]);
+                setBulkSellData({ ticketTypeId: '' });
             }
         });
     };
@@ -122,19 +99,46 @@ export const Tickets: React.FC = () => {
         e.preventDefault();
         if (selectedTickets.length === 0 || !selectedOperationId) return;
 
+        // Build updates preserving existing ticket types
+        const updates: any = {
+            is_paid: bulkData.is_paid,
+            is_sold: true, // If paying, it's sold
+            payment_reference: bulkData.payment_reference || null,
+            payment_date: bulkData.payment_date || new Date().toISOString()
+        };
+
+        // Only set ticket_type_id if a new type is selected
+        if (bulkData.ticketTypeId) {
+            updates.ticket_type_id = bulkData.ticketTypeId;
+        }
+
         updateTickets.mutate({
             ids: selectedTickets,
             operationId: selectedOperationId,
-            updates: {
-                is_paid: bulkData.is_paid,
-                is_sold: true, // If paying, it's sold
-                payment_reference: bulkData.payment_reference || null,
-                payment_date: bulkData.payment_date || new Date().toISOString()
-            }
+            updates
         }, {
             onSuccess: () => {
                 setIsBulkModalOpen(false);
                 setSelectedTickets([]);
+                setBulkData({ is_paid: true, payment_reference: '', payment_date: new Date().toISOString().split('T')[0], ticketTypeId: '' });
+            }
+        });
+    };
+
+    const handleCancelTicket = (ticketId: string) => {
+        if (!selectedOperationId) return;
+        updateTickets.mutate({
+            ids: [ticketId],
+            operationId: selectedOperationId,
+            updates: {
+                is_sold: false,
+                is_paid: false,
+                payment_reference: null,
+                payment_date: null
+            }
+        }, {
+            onSuccess: () => {
+                setTicketToCancel(null);
             }
         });
     };
@@ -167,14 +171,24 @@ export const Tickets: React.FC = () => {
                         Assigner
                     </Button>
                     {selectedTickets.length > 0 && (
-                        <Button
-                            variant="secondary"
-                            onClick={() => setIsBulkModalOpen(true)}
-                            className="flex items-center gap-2 animate-in slide-in-from-right-4"
-                        >
-                            <CreditCard size={18} />
-                            Payer ({selectedTickets.length})
-                        </Button>
+                        <>
+                            <Button
+                                variant="secondary"
+                                onClick={() => setIsBulkSellModalOpen(true)}
+                                className="flex items-center gap-2 animate-in slide-in-from-right-4"
+                            >
+                                <ShoppingBag size={18} />
+                                Vendre ({selectedTickets.length})
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                onClick={() => setIsBulkModalOpen(true)}
+                                className="flex items-center gap-2 animate-in slide-in-from-right-4"
+                            >
+                                <CreditCard size={18} />
+                                Payer ({selectedTickets.length})
+                            </Button>
+                        </>
                     )}
                 </div>
             </div>
@@ -266,7 +280,16 @@ export const Tickets: React.FC = () => {
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <Button variant="ghost" className="text-xs h-8 text-emerald-600 hover:bg-emerald-50" onClick={() => handleEdit(ticket)}>Modifier</Button>
+                                                {(ticket.is_sold || ticket.is_paid) && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="text-xs h-8 text-rose-600 hover:bg-rose-50"
+                                                        onClick={() => setTicketToCancel(ticket.id)}
+                                                    >
+                                                        <X size={16} />
+                                                        Annuler
+                                                    </Button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))
@@ -300,15 +323,6 @@ export const Tickets: React.FC = () => {
                         <option value="">Sélectionner un vendeur</option>
                         {sellers?.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </Select>
-                    <Select
-                        label="Type de billet"
-                        required
-                        value={assignData.ticketTypeId}
-                        onChange={e => setAssignData({ ...assignData, ticketTypeId: e.target.value })}
-                    >
-                        <option value="">Sélectionner un type</option>
-                        {ticketTypes?.map(t => <option key={t.id} value={t.id}>{t.name} ({t.price}Ar)</option>)}
-                    </Select>
                     <div className="grid grid-cols-2 gap-4">
                         <Input
                             label="De (Numéro)"
@@ -337,55 +351,28 @@ export const Tickets: React.FC = () => {
                 </form>
             </Modal>
 
-            {/* Edit Modal */}
+            {/* Bulk Sell Modal */}
             <Modal
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-                title={`Modifier Billet #${selectedTicket?.number}`}
+                isOpen={isBulkSellModalOpen}
+                onClose={() => setIsBulkSellModalOpen(false)}
+                title={`Vendre (${selectedTickets.length} billets)`}
             >
-                <form onSubmit={handleUpdate} className="space-y-4">
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
-                        <label className="text-sm font-medium text-slate-700">Billet vendu ?</label>
-                        <input
-                            type="checkbox"
-                            className="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                            checked={editData.is_sold}
-                            onChange={e => setEditData({ ...editData, is_sold: e.target.checked })}
-                        />
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
-                        <label className="text-sm font-medium text-slate-700">Billet payé ?</label>
-                        <input
-                            type="checkbox"
-                            className="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                            checked={editData.is_paid}
-                            onChange={e => setEditData({ ...editData, is_paid: e.target.checked })}
-                        />
-                    </div>
-                    <Input
-                        label="Référence de paiement"
-                        placeholder="Ex: Virement, Espèces, PayPal ID"
-                        value={editData.payment_reference}
-                        onChange={e => setEditData({ ...editData, payment_reference: e.target.value })}
-                    />
-                    <Input
-                        label="Date de paiement"
-                        type="date"
-                        value={editData.payment_date}
-                        onChange={e => setEditData({ ...editData, payment_date: e.target.value })}
-                    />
+                <form onSubmit={handleBulkSell} className="space-y-4">
+                    <p className="text-sm text-slate-400 mb-4">
+                        Vous allez marquer {selectedTickets.length} billets comme vendus.
+                    </p>
                     <Select
-                        label="Type"
-                        value={editData.ticketTypeId}
-                        onChange={e => setEditData({ ...editData, ticketTypeId: e.target.value })}
+                        label="Type de billet"
+                        value={bulkSellData.ticketTypeId}
+                        onChange={e => setBulkSellData({ ...bulkSellData, ticketTypeId: e.target.value })}
                     >
                         <option value="">Sans type</option>
-                        {ticketTypes?.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                        {ticketTypes?.map(t => <option key={t.id} value={t.id}>{t.name} ({t.price}Ar)</option>)}
                     </Select>
                     <div className="flex gap-3 pt-4">
-                        <Button type="button" variant="outline" className="flex-1" onClick={() => setIsEditModalOpen(false)}>Annuler</Button>
-                        <Button type="submit" className="flex-1" disabled={updateTicket.isPending}>
-                            {updateTicket.isPending ? 'Chargement...' : 'Enregistrer'}
+                        <Button type="button" variant="outline" className="flex-1" onClick={() => setIsBulkSellModalOpen(false)}>Annuler</Button>
+                        <Button type="submit" className="flex-1" disabled={updateTickets.isPending} variant="secondary">
+                            {updateTickets.isPending ? 'Chargement...' : 'Marquer comme vendu'}
                         </Button>
                     </div>
                 </form>
@@ -401,6 +388,16 @@ export const Tickets: React.FC = () => {
                     <p className="text-sm text-slate-400 mb-4">
                         Vous allez marquer {selectedTickets.length} billets comme payés pour l'opération en cours.
                     </p>
+                    {selectedTickets.some(id => !tickets?.find(t => t.id === id)?.ticket_type_id) && (
+                        <Select
+                            label="Type de billet"
+                            value={bulkData.ticketTypeId}
+                            onChange={e => setBulkData({ ...bulkData, ticketTypeId: e.target.value })}
+                        >
+                            <option value="">Sans type</option>
+                            {ticketTypes?.map(t => <option key={t.id} value={t.id}>{t.name} ({t.price}Ar)</option>)}
+                        </Select>
+                    )}
                     <Input
                         label="Référence de paiement commune"
                         placeholder="Ex: Virement groupé, Chèque global"
@@ -422,6 +419,25 @@ export const Tickets: React.FC = () => {
                         </Button>
                     </div>
                 </form>
+            </Modal>
+
+            {/* Cancel Ticket Modal */}
+            <Modal
+                isOpen={!!ticketToCancel}
+                onClose={() => setTicketToCancel(null)}
+                title="Annuler ce billet"
+            >
+                <div className="space-y-4">
+                    <p className="text-sm text-slate-600">
+                        Êtes-vous sûr de vouloir annuler ce billet ? Il passera en statut "Disponible" et "Attente".
+                    </p>
+                    <div className="flex gap-3 pt-4">
+                        <Button type="button" variant="outline" className="flex-1" onClick={() => setTicketToCancel(null)}>Annuler</Button>
+                        <Button type="button" className="flex-1 bg-rose-600 hover:bg-rose-700" onClick={() => ticketToCancel && handleCancelTicket(ticketToCancel)} disabled={updateTickets.isPending}>
+                            {updateTickets.isPending ? 'Chargement...' : 'Confirmer l\'annulation'}
+                        </Button>
+                    </div>
+                </div>
             </Modal>
         </div>
     );

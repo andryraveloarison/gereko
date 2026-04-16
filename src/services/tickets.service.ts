@@ -13,7 +13,7 @@ export const ticketsService = {
         return data as Ticket[];
     },
 
-    async assignTickets(operationId: string, sellerId: string, startNumber: number, endNumber: number, ticketTypeId?: string) {
+    async assignTickets(operationId: string, sellerId: string, startNumber: number, endNumber: number) {
         const tickets = [];
         for (let i = startNumber; i <= endNumber; i++) {
             tickets.push({
@@ -22,7 +22,7 @@ export const ticketsService = {
                 number: i,
                 is_sold: false,
                 is_paid: false,
-                ticket_type_id: ticketTypeId || null
+                ticket_type_id: null
             });
         }
 

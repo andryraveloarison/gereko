@@ -62,8 +62,8 @@ export function useTickets(operationId?: string | null) {
 export function useAssignTickets() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ operationId, sellerId, startNumber, endNumber, ticketTypeId }: { operationId: string, sellerId: string, startNumber: number, endNumber: number, ticketTypeId?: string }) =>
-            ticketsService.assignTickets(operationId, sellerId, startNumber, endNumber, ticketTypeId),
+        mutationFn: ({ operationId, sellerId, startNumber, endNumber }: { operationId: string, sellerId: string, startNumber: number, endNumber: number }) =>
+            ticketsService.assignTickets(operationId, sellerId, startNumber, endNumber),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['tickets', variables.operationId] });
         },
