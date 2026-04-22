@@ -50,6 +50,27 @@ export function useCreateSeller() {
     });
 }
 
+export function useUpdateSeller() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, updates }: { id: string, updates: Partial<Seller> }) =>
+            sellersService.update(id, updates),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['sellers'] });
+        },
+    });
+}
+
+export function useDeleteSeller() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => sellersService.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['sellers'] });
+        },
+    });
+}
+
 // Tickets Hooks
 export function useTickets(operationId?: string | null) {
     return useQuery({

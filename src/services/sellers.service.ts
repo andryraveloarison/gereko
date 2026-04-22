@@ -21,5 +21,26 @@ export const sellersService = {
 
         if (error) throw error;
         return data as Seller;
+    },
+
+    async update(id: string, updates: Partial<Seller>) {
+        const { data, error } = await supabase
+            .from('sellers')
+            .update(updates)
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data as Seller;
+    },
+
+    async delete(id: string) {
+        const { error } = await supabase
+            .from('sellers')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
     }
 };

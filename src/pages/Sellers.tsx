@@ -1,22 +1,56 @@
 import React, { useState } from 'react';
-import { useSellers, useCreateSeller } from '../hooks/useData';
+import { useSellers, useCreateSeller, useUpdateSeller, useDeleteSeller } from '../hooks/useData';
 import { Card, Button, Input, Modal } from '../components/UI';
-import { Plus, MoreVertical } from 'lucide-react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
+import type { Seller } from '../types';
 
 export const Sellers: React.FC = () => {
     const { data: sellers, isLoading } = useSellers();
     const createSeller = useCreateSeller();
+    const updateSeller = useUpdateSeller();
+    const deleteSeller = useDeleteSeller();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingSeller, setEditingSeller] = useState<Seller | null>(null);
     const [formData, setFormData] = useState({ name: '' });
+
+    const handleOpenAdd = () => {
+        setEditingSeller(null);
+        setFormData({ name: '' });
+        setIsModalOpen(true);
+    };
+
+    const handleOpenEdit = (seller: Seller) => {
+        setEditingSeller(seller);
+        setFormData({ name: seller.name });
+        setIsModalOpen(true);
+    };
+
+    const handleDelete = async (id: string, name: string) => {
+        if (window.confirm(`Êtes-vous sûr de vouloir supprimer le vendeur "${name}" ?`)) {
+            await deleteSeller.mutateAsync(id);
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        createSeller.mutate(formData, {
-            onSuccess: () => {
-                setIsModalOpen(false);
-                setFormData({ name: '' });
-            }
-        });
+
+        if (editingSeller) {
+            updateSeller.mutate({ id: editingSeller.id, updates: formData }, {
+                onSuccess: () => {
+                    setIsModalOpen(false);
+                    setEditingSeller(null);
+                    setFormData({ name: '' });
+                }
+            });
+        } else {
+            createSeller.mutate(formData, {
+                onSuccess: () => {
+                    setIsModalOpen(false);
+                    setFormData({ name: '' });
+                }
+            });
+        }
     };
 
     return (
@@ -26,7 +60,7 @@ export const Sellers: React.FC = () => {
                     <h1 className="text-2xl font-bold text-slate-900">Vendeurs</h1>
                     <p className="text-slate-500">Gérez votre équipe de vente</p>
                 </div>
-                <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2">
+                <Button onClick={handleOpenAdd} className="flex items-center gap-2">
                     <Plus size={18} />
                     Ajouter un Vendeur
                 </Button>
@@ -60,9 +94,22 @@ export const Sellers: React.FC = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <button className="p-2 text-slate-500 hover:text-white transition-colors">
-                                            <MoreVertical size={20} />
-                                        </button>
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => handleOpenEdit(seller)}
+                                                className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                                                title="Modifier"
+                                            >
+                                                <Pencil size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(seller.id, seller.name)}
+                                                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                                                title="Supprimer"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
@@ -81,7 +128,7 @@ export const Sellers: React.FC = () => {
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title="Ajouter un Vendeur"
+                title={editingSeller ? "Modifier le Vendeur" : "Ajouter un Vendeur"}
             >
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <Input
@@ -93,8 +140,8 @@ export const Sellers: React.FC = () => {
                     />
                     <div className="flex gap-3 pt-4">
                         <Button type="button" variant="outline" className="flex-1" onClick={() => setIsModalOpen(false)}>Annuler</Button>
-                        <Button type="submit" className="flex-1" disabled={createSeller.isPending}>
-                            {createSeller.isPending ? 'Chargement...' : 'Ajouter'}
+                        <Button type="submit" className="flex-1" disabled={createSeller.isPending || updateSeller.isPending}>
+                            {createSeller.isPending || updateSeller.isPending ? 'Chargement...' : (editingSeller ? 'Enregistrer' : 'Ajouter')}
                         </Button>
                     </div>
                 </form>
